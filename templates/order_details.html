@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Order Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Order Details</h5>
+                    <span class="badge bg-{{ order.status_color }}">{{ order.status }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Order Information</h6>
+                            <p><strong>Order ID:</strong> {{ order._id }}</p>
+                            <p><strong>Date:</strong> {{ order.date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                            <p><strong>Total:</strong> ₹{{ "%.2f"|format(order.total) }}</p>
+                            <p><strong>Payment Method:</strong> 
+                                {% if order.payment_method == 'cash' %}
+                                    Cash on Delivery
+                                {% elif order.payment_method == 'card' %}
+                                    Credit/Debit Card
+                                {% elif order.payment_method == 'upi' %}
+                                    UPI Payment
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Shipping Information</h6>
+                            <p><strong>Name:</strong> {{ order.shipping_address.full_name }}</p>
+                            <p><strong>Address:</strong> {{ order.shipping_address.address }}</p>
+                            <p><strong>City:</strong> {{ order.shipping_address.city }}</p>
+                            <p><strong>State:</strong> {{ order.shipping_address.state }}</p>
+                            <p><strong>ZIP Code:</strong> {{ order.shipping_address.zip_code }}</p>
+                            <p><strong>Phone:</strong> {{ order.shipping_address.phone }}</p>
+                        </div>
+                    </div>
+                    
+                    <h6>Order Items</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Image</th>
+                                    <th>Unit Price</th>
+                                    <th>Quantity</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">{{ item.product.name }}</div>
+                                        <small class="text-muted">Category: {{ item.product.category }}</small>
+                                    </td>
+                                    <td>
+                                        <img src="{{ url_for('static', filename='images/' + item.product.image) }}" 
+                                             alt="{{ item.product.name }}" 
+                                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;"
+                                             onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                                    </td>
+                                    <td>
+                                        <div>₹{{ "%.2f"|format(item.product.price) }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">{{ item.quantity }}</div>
+                                        <small class="text-muted">units</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">₹{{ "%.2f"|format(item.total) }}</div>
+                                        <small class="text-muted">({{ item.quantity }} × ₹{{ "%.2f"|format(item.product.price) }})</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-light">
+                                    <td colspan="4" class="text-end"><strong>Total Amount:</strong></td>
+                                    <td>
+                                        <div class="fw-bold fs-5">₹{{ "%.2f"|format(order.total) }}</div>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    {% if order.payment_method == 'cash' %}
+                    <div class="alert alert-info mt-4">
+                        <h6 class="alert-heading">Cash on Delivery</h6>
+                        <p class="mb-0">Please keep ₹{{ "%.2f"|format(order.total) }} ready at the time of delivery.</p>
+                    </div>
+                    {% elif order.payment_method == 'card' %}
+                    <div class="alert alert-success mt-4">
+                        <h6 class="alert-heading">Card Payment Details</h6>
+                        <p class="mb-0">Payment completed using card ending with {{ order.payment_details.card_number[-4:] }}</p>
+                    </div>
+                    {% elif order.payment_method == 'upi' %}
+                    <div class="alert alert-success mt-4">
+                        <h6 class="alert-heading">UPI Payment Details</h6>
+                        <p class="mb-0">Payment completed using UPI ID: {{ order.payment_details.upi_id }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <a href="{{ url_for('profile_details') }}" class="btn btn-secondary">Back to Profile</a>
+                <a href="{{ url_for('shop') }}" class="btn btn-primary">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}View Order - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Order Details</h5>
+                    <div class="dropdown">
+                        <button class="btn btn-{{ order.status_color }} dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            {{ order.status }}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <form action="{{ url_for('update_order_status', order_id=order._id) }}" method="POST" style="display: inline;">
+                                    <input type="hidden" name="status" value="Pending">
+                                    <button type="submit" class="dropdown-item">Pending</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="{{ url_for('update_order_status', order_id=order._id) }}" method="POST" style="display: inline;">
+                                    <input type="hidden" name="status" value="Processing">
+                                    <button type="submit" class="dropdown-item">Processing</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="{{ url_for('update_order_status', order_id=order._id) }}" method="POST" style="display: inline;">
+                                    <input type="hidden" name="status" value="Shipped">
+                                    <button type="submit" class="dropdown-item">Shipped</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="{{ url_for('update_order_status', order_id=order._id) }}" method="POST" style="display: inline;">
+                                    <input type="hidden" name="status" value="Delivered">
+                                    <button type="submit" class="dropdown-item">Delivered</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="{{ url_for('update_order_status', order_id=order._id) }}" method="POST" style="display: inline;">
+                                    <input type="hidden" name="status" value="Cancelled">
+                                    <button type="submit" class="dropdown-item">Cancelled</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Order Information</h6>
+                            <p><strong>Order ID:</strong> {{ order._id }}</p>
+                            <p><strong>Date:</strong> {{ order.date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                            <p><strong>Total:</strong> {{ order.total|usd_to_inr }}</p>
+                            <p><strong>Status:</strong> <span class="badge bg-{{ order.status_color }}">{{ order.status }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Customer Information</h6>
+                            <p><strong>Name:</strong> {{ customer.full_name }}</p>
+                            <p><strong>Email:</strong> {{ customer.email }}</p>
+                            <p><strong>Phone:</strong> {{ customer.phone if customer.phone else 'N/A' }}</p>
+                        </div>
+                    </div>
+                    
+                    <h6>Order Items</h6>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Image</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items %}
+                                <tr>
+                                    <td>{{ item.product.get('name', 'Product Not Found') }}</td>
+                                    <td>
+                                        <img src="{{ url_for('static', filename='images/' + item.product.get('image', 'placeholder.jpg')) }}" 
+                                             alt="{{ item.product.get('name', 'Product Not Found') }}" 
+                                             style="width: 50px; height: 50px; object-fit: cover;"
+                                             onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                                    </td>
+                                    <td>{{ item.product.get('price', 0)|usd_to_inr }}</td>
+                                    <td>{{ item.get('quantity', 1) }}</td>
+                                    <td>{{ (item.product.get('price', 0) * item.get('quantity', 1))|usd_to_inr }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                                    <td>{{ order.get('total', 0)|usd_to_inr }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    {% if order.shipping_address %}
+                    <div class="mt-4">
+                        <h6>Shipping Address</h6>
+                        <p>
+                            {{ order.shipping_address.full_name }}<br>
+                            {{ order.shipping_address.address }}<br>
+                            {{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.zip_code }}<br>
+                            Phone: {{ order.shipping_address.phone }}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

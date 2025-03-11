@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Newsletter Management - Pet Shop{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Newsletter Management</h2>
+            
+            <!-- Send Newsletter Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Send Newsletter</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('send_newsletter') }}" method="POST">
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Newsletter</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Subscribers List -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Subscribers</h5>
+                    <a href="{{ url_for('export_subscribers') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-download"></i> Export CSV
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Subscribed Date</th>
+                                    <th>Unsubscribed Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subscriber in subscribers %}
+                                <tr>
+                                    <td>{{ subscriber.email }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if subscriber.status == 'active' else 'secondary' }}">
+                                            {{ subscriber.status.title() }}
+                                        </span>
+                                    </td>
+                                    <td>{{ subscriber.subscribed_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                    <td>
+                                        {% if subscriber.unsubscribed_at %}
+                                            {{ subscriber.unsubscribed_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Newsletter Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Newsletter Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const contentTextarea = document.getElementById('content');
+    const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+    const previewContent = document.getElementById('previewContent');
+    
+    // Preview button
+    const previewButton = document.createElement('button');
+    previewButton.type = 'button';
+    previewButton.className = 'btn btn-outline-secondary ms-2';
+    previewButton.innerHTML = '<i class="bi bi-eye"></i> Preview';
+    previewButton.onclick = function() {
+        previewContent.innerHTML = contentTextarea.value;
+        previewModal.show();
+    };
+    
+    contentTextarea.parentNode.appendChild(previewButton);
+});
+</script>
+{% endblock %} 

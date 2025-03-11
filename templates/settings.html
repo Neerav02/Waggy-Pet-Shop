@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Pet Shop{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Profile Sidebar -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <div class="profile-image-container mb-3">
+                        <img src="{{ url_for('static', filename='images/profiles/' + (user.profile_image if user.profile_image else 'default.svg')) }}" 
+                             alt="Profile Image" 
+                             class="rounded-circle profile-image"
+                             style="width: 150px; height: 150px; object-fit: cover;">
+                        <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#profileImageModal">
+                            <i class="bi bi-camera"></i> Change Photo
+                        </button>
+                    </div>
+                    <h5 class="card-title">{{ user.username }}</h5>
+                    <p class="text-muted">{{ user.email }}</p>
+                </div>
+            </div>
+
+            <div class="list-group">
+                <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-person"></i> Profile
+                </a>
+                <a href="{{ url_for('profile_details') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-person-vcard"></i> Profile Details
+                </a>
+                <a href="{{ url_for('help') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-question-circle"></i> Help
+                </a>
+                <a href="{{ url_for('settings') }}" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-gear"></i> Settings
+                </a>
+            </div>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="col-md-9">
+            <!-- Change Password -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Change Password</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('update_password') }}" method="POST">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-control" name="current_password" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-control" name="new_password" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Notification Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('update_notifications') }}" method="POST">
+                        <div class="mb-3">
+                            <h6>Email Notifications</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="orderUpdates" name="order_updates" checked>
+                                <label class="form-check-label" for="orderUpdates">
+                                    Order Updates
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="promotions" name="promotions">
+                                <label class="form-check-label" for="promotions">
+                                    Promotions and Offers
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="newsletter" name="newsletter">
+                                <label class="form-check-label" for="newsletter">
+                                    Newsletter
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Notification Settings</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Privacy Settings -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Privacy Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('update_privacy') }}" method="POST">
+                        <div class="mb-3">
+                            <h6>Profile Visibility</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="profile_visibility" id="public" value="public">
+                                <label class="form-check-label" for="public">
+                                    Public
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="profile_visibility" id="private" value="private" checked>
+                                <label class="form-check-label" for="private">
+                                    Private
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Privacy Settings</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Deletion -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Delete Account</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Once you delete your account, there is no going back. Please be certain.</p>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                        Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Image Modal -->
+<div class="modal fade" id="profileImageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Profile Photo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('update_profile_image') }}" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="profile_image" class="form-label">Choose New Photo</label>
+                        <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload Photo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                <form action="{{ url_for('delete_account') }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Enter your password to confirm</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Delete Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

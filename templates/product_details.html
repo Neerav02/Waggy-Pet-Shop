@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Pet Shop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-gallery {
+        position: relative;
+    }
+    
+    .product-main-image {
+        height: 400px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    
+    .product-thumbnails {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .product-thumbnail {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: opacity 0.3s;
+    }
+    
+    .product-thumbnail:hover {
+        opacity: 0.8;
+    }
+    
+    .product-info {
+        padding: 20px;
+    }
+    
+    .product-title {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+    
+    .product-price {
+        font-size: 1.5rem;
+        color: #007bff;
+        margin-bottom: 1.5rem;
+    }
+    
+    .product-description {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+    
+    .product-meta {
+        margin-bottom: 2rem;
+    }
+    
+    .product-meta p {
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-meta strong {
+        color: #333;
+        margin-right: 10px;
+    }
+    
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 2rem;
+    }
+    
+    .quantity-btn {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #ddd;
+        background: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .quantity-btn:hover {
+        background: #f8f9fa;
+    }
+    
+    .quantity-input {
+        width: 60px;
+        height: 40px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .add-to-cart-btn {
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .product-features {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid #eee;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-icon {
+        color: #007bff;
+        margin-right: 10px;
+    }
+    
+    .related-products {
+        margin-top: 4rem;
+    }
+    
+    .related-product-card {
+        transition: transform 0.3s;
+    }
+    
+    .related-product-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="product-image">
+                <img src="{{ url_for('static', filename='images/' + product.image) }}" 
+                     alt="{{ product.name }}" 
+                     class="img-fluid rounded">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h1 class="mb-4">{{ product.name }}</h1>
+            <p class="text-muted mb-4">Category: {{ product.category }}</p>
+            <h2 class="text-primary mb-4">${{ "%.2f"|format(product.price) }}</h2>
+            <p class="mb-4">{{ product.description }}</p>
+            
+            <div class="d-flex align-items-center mb-4">
+                <div class="input-group" style="max-width: 150px;">
+                    <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(-1)">-</button>
+                    <input type="number" class="form-control text-center" id="quantity" value="1" min="1">
+                    <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(1)">+</button>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-lg" onclick="addToCart('{{ product._id }}')">
+                Add to Cart
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateQuantity(change) {
+    const input = document.getElementById('quantity');
+    const newValue = parseInt(input.value) + change;
+    if (newValue >= 1) {
+        input.value = newValue;
+    }
+}
+
+function addToCart(productId) {
+    const quantity = parseInt(document.getElementById('quantity').value);
+    fetch(`/cart/add/${productId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ quantity: quantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            const toast = new bootstrap.Toast(document.getElementById('successToast'));
+            toast.show();
+            
+            // Update cart count
+            fetch('/cart/count')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cartCount').textContent = data.count;
+                });
+        } else {
+            // Show error message
+            const toast = new bootstrap.Toast(document.getElementById('errorToast'));
+            document.getElementById('errorMessage').textContent = data.error;
+            toast.show();
+            
+            // If login required, redirect after delay
+            if (data.error === 'Please login to add items to cart') {
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1500);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        const toast = new bootstrap.Toast(document.getElementById('errorToast'));
+        document.getElementById('errorMessage').textContent = 'An error occurred. Please try again.';
+        toast.show();
+    });
+}
+</script>
+
+<!-- Success Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Success</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Item added to cart successfully!
+        </div>
+    </div>
+</div>
+
+<!-- Error Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <strong class="me-auto">Error</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="errorMessage">
+            An error occurred. Please try again.
+        </div>
+    </div>
+</div>
+{% endblock %} 

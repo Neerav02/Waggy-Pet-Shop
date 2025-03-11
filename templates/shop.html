@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}Shop - Pet Shop{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section */
+    .shop-hero {
+        background: #DEAD6F;
+        padding: 3rem 0;
+        margin-bottom: 3rem;
+        text-align: center;
+        animation: fadeIn 1s ease-out;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .shop-hero h1 {
+        font-size: 2.8rem;
+        margin-bottom: 1rem;
+        animation: slideIn 0.8s ease-out;
+        font-weight: 600;
+        color: #333;
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .shop-hero p {
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin: 0 auto;
+        animation: slideIn 0.8s ease-out 0.2s backwards;
+        color: #666;
+    }
+
+    /* Category Filter */
+    .filter-section {
+        margin-bottom: 3rem;
+        animation: fadeIn 0.8s ease-out 0.4s backwards;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .btn-outline-primary {
+        transition: all 0.3s ease;
+        transform-origin: center;
+        border-radius: 25px;
+        padding: 0.5rem 1.2rem;
+    }
+
+    .btn-outline-primary:hover {
+        transform: scale(1.05);
+    }
+
+    /* Product Cards */
+    .product-card {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.5s ease;
+    }
+
+    .product-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .card {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+    }
+
+    .product-image-wrapper {
+        position: relative;
+        overflow: hidden;
+        padding-top: 75%; /* 4:3 Aspect Ratio */
+    }
+
+    .product-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: all 0.5s ease;
+    }
+
+    .card:hover .product-image {
+        transform: scale(1.08);
+    }
+
+    .card-body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        background: white;
+    }
+
+    .product-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+        color: #333;
+        text-decoration: none;
+        transition: color 0.3s ease;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .product-name:hover {
+        color: var(--bs-primary);
+    }
+
+    .product-description {
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex-grow: 1;
+    }
+
+    .product-price {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--bs-primary);
+        margin-bottom: 1rem;
+    }
+
+    .btn-primary {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border-radius: 25px;
+        padding: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-primary::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        transition: width 0.6s ease, height 0.6s ease;
+        transform: translate(-50%, -50%);
+    }
+
+    .btn-primary:active::after {
+        width: 200%;
+        height: 200%;
+    }
+
+    /* Loading Animation */
+    @keyframes shimmer {
+        0% { background-position: -1000px 0; }
+        100% { background-position: 1000px 0; }
+    }
+
+    .loading {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 1000px 100%;
+        animation: shimmer 2s infinite linear;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .empty-state p {
+        color: #666;
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="shop-hero">
+    <div class="container">
+        <h1>Our Products</h1>
+        <p>Discover our wide range of quality pet products</p>
+        </div>
+    </div>
+
+<div class="container py-5">
+    <!-- Category Filter -->
+    <div class="filter-section mb-4">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-primary active" onclick="filterProducts('all')">All</button>
+            <button type="button" class="btn btn-outline-primary" onclick="filterProducts('Food')">Food</button>
+            <button type="button" class="btn btn-outline-primary" onclick="filterProducts('Toys')">Toys</button>
+            <button type="button" class="btn btn-outline-primary" onclick="filterProducts('Accessories')">Accessories</button>
+            <button type="button" class="btn btn-outline-primary" onclick="filterProducts('Grooming')">Grooming</button>
+            <button type="button" class="btn btn-outline-primary" onclick="filterProducts('Housing')">Housing</button>
+            <button type="button" class="btn btn-outline-primary" onclick="filterProducts('Equipment')">Equipment</button>
+            <button type="button" class="btn btn-outline-primary" onclick="filterProducts('Travel')">Travel</button>
+            <button type="button" class="btn btn-outline-primary" onclick="filterProducts('Bedding')">Bedding</button>
+        </div>
+    </div>
+
+    {% if products %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for product in products %}
+        <div class="col product-card" data-category="{{ product.category }}">
+            <div class="card">
+                <a href="{{ url_for('product_details', product_id=product._id) }}" class="product-image-wrapper">
+                    <img src="{{ url_for('static', filename='images/' + product.image) }}" 
+                         class="product-image" 
+                         alt="{{ product.name }}"
+                         onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                        </a>
+                        <div class="card-body">
+                    <a href="{{ url_for('product_details', product_id=product._id) }}" class="product-name">
+                        {{ product.name }}
+                    </a>
+                    <p class="product-description">{{ product.description }}</p>
+                    <div class="product-price">₹{{ "%.2f"|format(product.price) }}</div>
+                    {% if 'user_id' in session %}
+                    <button onclick="addToCart('{{ product._id }}')" class="btn btn-primary w-100">
+                        Add to Cart
+                    </button>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary w-100">
+                        Login to Purchase
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+                        </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No products found in this category.</p>
+        <button type="button" class="btn btn-primary" onclick="filterProducts('all')">View All Products</button>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function filterProducts(category) {
+    const products = document.querySelectorAll('.product-card');
+    products.forEach(product => {
+        if (category === 'all' || product.dataset.category === category) {
+            product.style.display = 'block';
+            setTimeout(() => {
+                product.classList.add('visible');
+            }, 50);
+        } else {
+            product.style.display = 'none';
+            product.classList.remove('visible');
+        }
+    });
+
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent === category || (category === 'all' && btn.textContent === 'All')) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+// Initialize animations on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const products = document.querySelectorAll('.product-card');
+    products.forEach((product, index) => {
+        setTimeout(() => {
+            product.classList.add('visible');
+        }, index * 100);
+    });
+});
+
+// Animate products on scroll
+const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.product-card').forEach(card => {
+    observer.observe(card);
+});
+
+// Add loading animation for images
+document.querySelectorAll('.product-image').forEach(img => {
+    img.classList.add('loading');
+    img.onload = function() {
+        this.classList.remove('loading');
+    }
+});
+</script>
+{% endblock %}
