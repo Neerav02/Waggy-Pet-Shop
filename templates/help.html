@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Help & Support - Pet Shop{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Profile Sidebar -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <div class="profile-image-container mb-3">
+                        <img src="{{ url_for('static', filename='images/profiles/' + (user.profile_image if user.profile_image else 'default.svg')) }}" 
+                             alt="Profile Image" 
+                             class="rounded-circle profile-image"
+                             style="width: 150px; height: 150px; object-fit: cover;">
+                        <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#profileImageModal">
+                            <i class="bi bi-camera"></i> Change Photo
+                        </button>
+                    </div>
+                    <h5 class="card-title">{{ user.username }}</h5>
+                    <p class="text-muted">{{ user.email }}</p>
+                </div>
+            </div>
+
+            <div class="list-group">
+                <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-person"></i> Profile
+                </a>
+                <a href="{{ url_for('profile_details') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-person-vcard"></i> Profile Details
+                </a>
+                <a href="{{ url_for('help') }}" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-question-circle"></i> Help
+                </a>
+                <a href="{{ url_for('settings') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-gear"></i> Settings
+                </a>
+            </div>
+        </div>
+
+        <!-- Help Content -->
+        <div class="col-md-9">
+            <!-- Search Help -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Search Help</h5>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search for help topics...">
+                        <button class="btn btn-primary">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQs -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Frequently Asked Questions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="helpAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    How do I track my order?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    You can track your order by going to the "Orders" section in your profile. Click on the order number to view detailed tracking information.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    What payment methods do you accept?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    We accept all major credit cards, debit cards, and UPI payments.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    How can I contact customer support?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    You can contact our customer support team through email at support@petshop.com or call us at 1-800-PET-SHOP.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Support -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Contact Support</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Customer Support</h6>
+                            <p><i class="bi bi-telephone"></i> 1-800-PET-SHOP</p>
+                            <p><i class="bi bi-envelope"></i> support@petshop.com</p>
+                            <p><i class="bi bi-clock"></i> Mon-Fri: 9:00 AM - 6:00 PM</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Send us a Message</h6>
+                            <form action="{{ url_for('contact_support') }}" method="POST">
+                                <div class="mb-3">
+                                    <label class="form-label">Subject</label>
+                                    <input type="text" class="form-control" name="subject" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Message</label>
+                                    <textarea class="form-control" name="message" rows="4" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Send Message</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Image Modal -->
+<div class="modal fade" id="profileImageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Profile Photo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('update_profile_image') }}" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="profile_image" class="form-label">Choose New Photo</label>
+                        <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload Photo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

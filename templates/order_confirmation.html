@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmation - Pet Shop{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body p-5">
+                    <div class="mb-4 text-center">
+                        <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h2 class="text-center mb-4">Thank You for Your Order!</h2>
+                    
+                    {% if order.payment_method == 'cash' %}
+                    <div class="alert alert-info mb-4">
+                        <h5 class="alert-heading">Cash on Delivery</h5>
+                        <p class="mb-0">Please keep the exact amount of ₹{{ "%.2f"|format(order.total) }} ready at the time of delivery.</p>
+                    </div>
+                    {% elif order.payment_method == 'card' %}
+                    <div class="alert alert-success mb-4">
+                        <h5 class="alert-heading">Card Payment Successful</h5>
+                        <p class="mb-0">Payment has been processed using the card ending with {{ order.payment_details.card_number[-4:] }}</p>
+                    </div>
+                    {% elif order.payment_method == 'upi' %}
+                    <div class="alert alert-success mb-4">
+                        <h5 class="alert-heading">UPI Payment Successful</h5>
+                        <p class="mb-0">Payment has been processed using UPI ID: {{ order.payment_details.upi_id }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Order Details</h5>
+                            <p class="mb-1"><strong>Order ID:</strong> {{ order._id }}</p>
+                            <p class="mb-1"><strong>Date:</strong> {{ order.date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                            <p class="mb-0"><strong>Total Amount:</strong> ₹{{ "%.2f"|format(order.total) }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mb-4">
+                        <p class="mb-0">We'll send you an email confirmation with your order details and tracking information once your order ships.</p>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                        <a href="{{ url_for('shop') }}" class="btn btn-primary">Continue Shopping</a>
+                        <a href="{{ url_for('view_order', order_id=order._id) }}" class="btn btn-outline-primary">View Order Details</a>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Return to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Cart - Pet Shop{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">Shopping Cart</h1>
+
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-md-8">
+            {% for item in cart_items %}
+            <div class="card mb-3">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="{{ url_for('static', filename='images/' + item.product.image) }}" 
+                             class="img-fluid rounded-start" 
+                             alt="{{ item.product.name }}"
+                             style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.product.name }}</h5>
+                            <p class="card-text">{{ item.product.description }}</p>
+                            <p class="card-text">
+                                <strong>Price:</strong> ₹{{ "%.2f"|format(item.product.price) }}<br>
+                                <strong>Quantity:</strong> {{ item.quantity }}<br>
+                                <strong>Total:</strong> ₹{{ "%.2f"|format(item.total) }}
+                            </p>
+                            <button onclick="removeFromCart('{{ item.product._id }}')" class="btn btn-danger">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Order Summary</h5>
+                    <p class="card-text">
+                        <strong>Total:</strong> ₹{{ "%.2f"|format(total) }}
+                    </p>
+                    <a href="{{ url_for('shop') }}" class="btn btn-primary w-100 mb-2">
+                        Continue Shopping
+                    </a>
+                    <a href="{{ url_for('checkout') }}" class="btn btn-success w-100">
+                        Proceed to Checkout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center">
+        <p>Your cart is empty.</p>
+        <a href="{{ url_for('shop') }}" class="btn btn-primary">
+            Continue Shopping
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
