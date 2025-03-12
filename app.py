@@ -20,22 +20,24 @@ app.secret_key = 'your-secret-key-here'
 
 # MongoDB Configuration
 try:
-    app.config["MONGO_URI"] = "mongodb://localhost:27017/Petshop"
+    # MongoDB Atlas Connection String
+    ATLAS_URI = "mongodb+srv://waggy:waggy123@mycluster.o38yu.mongodb.net/Petshop?retryWrites=true&w=majority"
+    app.config["MONGO_URI"] = ATLAS_URI
     mongo = PyMongo(app)
     # Test the connection
     mongo.db.command('ping')
-    logger.info("Successfully connected to MongoDB!")
+    logger.info("Successfully connected to MongoDB Atlas!")
     
-    # Migrate existing users to add date_joined field if missing
-    users_without_date = mongo.db.users.find({'date_joined': {'$exists': False}})
-    for user in users_without_date:
-        mongo.db.users.update_one(
-            {'_id': user['_id']},
-            {'$set': {'date_joined': datetime.now()}}
-        )
-        logger.info(f"Added date_joined field to user: {user['username']}")
+    # Create indexes if they don't exist
+    mongo.db.users.create_index("email", unique=True)
+    mongo.db.users.create_index("username", unique=True)
+    mongo.db.products.create_index("name")
+    mongo.db.orders.create_index("user_id")
+    mongo.db.cart.create_index("user_id", unique=True)
+    
+    logger.info("Database indexes created successfully!")
 except Exception as e:
-    logger.error(f"MongoDB connection error: {str(e)}")
+    logger.error(f"MongoDB Atlas connection error: {str(e)}")
     raise
 
 # Make mongo available to all templates
