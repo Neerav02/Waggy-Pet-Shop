@@ -1394,5 +1394,9 @@ def update_password():
         flash('An error occurred while updating your password', 'danger')
         return redirect(url_for('settings'))
 
-if __name__ == '__main__':
-    app.run(debug=True) 
+if __name__ == "__main__":
+    # Get port from environment variable or default to 10000
+    port = int(os.environ.get("PORT", 10000))
+    
+    # Run the app on 0.0.0.0 (all network interfaces)
+    app.run(host='0.0.0.0', port=port, debug=False) 
