@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Select Delivery Location</h4>
+                </div>
+                <div class="card-body">
+                    <button type="button" 
+                            class="btn btn-primary w-100 mb-3" 
+                            id="getCurrentLocation">
+                        <i class="fas fa-location-arrow me-2"></i>
+                        Use Current Location
+                    </button>
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="locationSearch" 
+                                   placeholder="Search for your location..."
+                                   autocomplete="off">
+                            <div id="locationResults" class="list-group mt-2"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="address" 
+                                   placeholder="Complete Address" 
+                                   required>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="city" 
+                                       placeholder="City" 
+                                       required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="state" 
+                                       placeholder="State" 
+                                       required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="pincode" 
+                                   placeholder="PIN Code" 
+                                   required>
+                        </div>
+                        
+                        <input type="hidden" name="latitude" id="latitude">
+                        <input type="hidden" name="longitude" id="longitude">
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            Confirm Location
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('getCurrentLocation').addEventListener('click', function() {
+    if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser');
+        return;
+    }
+    
+    this.disabled = true;
+    this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Getting location...';
+    
+    navigator.geolocation.getCurrentPosition(async (position) => {
+        try {
+            const response = await fetch('/api/locations/current', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                })
+            });
+            
+            const locationData = await response.json();
+            
+            if (response.ok) {
+                // Fill form fields
+                document.querySelector('[name="address"]').value = locationData.address;
+                document.querySelector('[name="city"]').value = locationData.city;
+                document.querySelector('[name="state"]').value = locationData.state;
+                document.querySelector('[name="pincode"]').value = locationData.pincode;
+                document.getElementById('latitude').value = position.coords.latitude;
+                document.getElementById('longitude').value = position.coords.longitude;
+            } else {
+                alert('Error getting location details. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error getting location. Please try again.');
+        } finally {
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-location-arrow me-2"></i>Use Current Location';
+        }
+    }, (error) => {
+        console.error('Geolocation error:', error);
+        alert('Error getting location. Please check your browser settings.');
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-location-arrow me-2"></i>Use Current Location';
+    }, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+    });
+});
+
+let placeTimeout;
+
+document.getElementById('locationSearch').addEventListener('input', function(e) {
+    clearTimeout(placeTimeout);
+    const query = e.target.value;
+    
+    if (query.length < 3) {
+        document.getElementById('locationResults').innerHTML = '';
+        return;
+    }
+    
+    placeTimeout = setTimeout(async () => {
+        try {
+            const response = await fetch(`/api/locations/search?q=${encodeURIComponent(query)}`);
+            const predictions = await response.json();
+            
+            const resultsDiv = document.getElementById('locationResults');
+            resultsDiv.innerHTML = '';
+            
+            predictions.forEach(prediction => {
+                const item = document.createElement('a');
+                item.className = 'list-group-item list-group-item-action';
+                item.innerHTML = prediction.description;
+                item.href = '#';
+                item.onclick = async (e) => {
+                    e.preventDefault();
+                    
+                    // Get location details
+                    const detailsResponse = await fetch(`/api/locations/details?place_id=${prediction.place_id}`);
+                    const locationData = await detailsResponse.json();
+                    
+                    // Fill form fields
+                    document.querySelector('[name="address"]').value = locationData.address;
+                    document.querySelector('[name="city"]').value = locationData.city;
+                    document.querySelector('[name="state"]').value = locationData.state;
+                    document.querySelector('[name="pincode"]').value = locationData.pincode;
+                    document.getElementById('latitude').value = locationData.coordinates.coordinates[1];
+                    document.getElementById('longitude').value = locationData.coordinates.coordinates[0];
+                    
+                    resultsDiv.innerHTML = '';
+                };
+                resultsDiv.appendChild(item);
+            });
+        } catch (error) {
+            console.error('Error searching locations:', error);
+        }
+    }, 300);
+});
+</script>
+{% endblock %}
