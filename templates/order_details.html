@@ -60,9 +60,10 @@
                                     </td>
                                     <td>
                                         <img src="{{ url_for('static', filename='images/' + item.product.image) }}" 
-                                             alt="{{ item.product.name }}" 
-                                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;"
-                                             onerror="this.src='{{ url_for(\"static\", filename=\"images/placeholder.jpg\") }}'">
+                                            alt="{{ item.product.name }}" 
+                                            style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;"
+                                            onerror="this.src='{{ url_for("static", filename="images/placeholder.jpg") }}'">
+
                                     </td>
                                     <td>
                                         <div>₹{{ "%.2f"|format(item.product.price) }}</div>
