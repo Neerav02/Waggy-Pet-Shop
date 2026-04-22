@@ -7,6 +7,7 @@ from bson import ObjectId
 import bcrypt
 import os
 from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
 from datetime import datetime, timedelta
 from functools import wraps
 import logging
@@ -43,6 +44,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # --- Core Config ---
 app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
