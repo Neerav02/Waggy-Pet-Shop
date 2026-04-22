@@ -1,3 +1,6 @@
+import gevent.monkey
+gevent.monkey.patch_all()
+
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, Response
 from flask_pymongo import PyMongo
 from bson import ObjectId
@@ -49,21 +52,22 @@ ATLAS_URI = os.environ.get("MONGO_URI")
 if not ATLAS_URI:
     raise ValueError("No MONGO_URI found in environment variables")
 app.config["MONGO_URI"] = ATLAS_URI
-mongo = PyMongo(app)
+mongo = PyMongo(app, connect=False)
 
-try:
-    mongo.db.command('ping')
-    logger.info("Successfully connected to MongoDB Atlas!")
-    mongo.db.users.create_index("email", unique=True)
-    mongo.db.users.create_index("username", unique=True)
-    mongo.db.products.create_index("name")
-    mongo.db.orders.create_index("user_id")
-    mongo.db.cart.create_index("user_id", unique=True)
-    mongo.db.delivery_locations.create_index([("coordinates", "2dsphere")])
-    logger.info("Database indexes created successfully!")
-except Exception as e:
-    logger.error(f"MongoDB Atlas connection error: {str(e)}")
-    raise
+@app.before_first_request
+def setup_database():
+    try:
+        mongo.db.command('ping')
+        logger.info("Successfully connected to MongoDB Atlas!")
+        mongo.db.users.create_index("email", unique=True)
+        mongo.db.users.create_index("username", unique=True)
+        mongo.db.products.create_index("name")
+        mongo.db.orders.create_index("user_id")
+        mongo.db.cart.create_index("user_id", unique=True)
+        mongo.db.delivery_locations.create_index([("coordinates", "2dsphere")])
+        logger.info("Database indexes created successfully!")
+    except Exception as e:
+        logger.error(f"MongoDB Atlas connection error: {str(e)}")
 
 # --- Google OAuth ---
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
@@ -98,7 +102,7 @@ groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 
 # --- SocketIO ---
-socketio = SocketIO(app, async_mode='threading', cors_allowed_origins="*")
+socketio = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
 
 # --- Location / Geopy ---
 geolocator = Nominatim(user_agent="waggy_pet_shop", timeout=10)
