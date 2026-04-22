@@ -4,6 +4,10 @@
   <p><strong>An Enterprise-Grade, Real-Time E-Commerce Platform Built for Pet Lovers</strong></p>
   
   <p>
+    <a href="https://waggy-pet-shop-ubkp.onrender.com/"><img src="https://img.shields.io/badge/Live_Website-Available_Now-success?style=for-the-badge&logo=vercel" alt="Live Demo" /></a>
+  </p>
+
+  <p>
     <a href="https://github.com/Neerav02/Waggy-Pet-Shop/issues"><img src="https://img.shields.io/github/issues/Neerav02/Waggy-Pet-Shop?style=for-the-badge&color=0d6efd" alt="Issues" /></a>
     <a href="https://github.com/Neerav02/Waggy-Pet-Shop/stargazers"><img src="https://img.shields.io/github/stars/Neerav02/Waggy-Pet-Shop?style=for-the-badge&color=ffc107" alt="Stars" /></a>
     <a href="https://github.com/Neerav02/Waggy-Pet-Shop/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Neerav02/Waggy-Pet-Shop?style=for-the-badge&color=198754" alt="License" /></a>
@@ -156,6 +160,13 @@ Navigate to `http://127.0.0.1:5000` in your browser!
 
 ## 🤝 Contributing
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/Neerav02/Waggy-Pet-Shop/issues).
+
+## 🔮 Future Work
+To continue scaling this platform, the following features are planned for future releases:
+- [ ] **Cloud Object Storage:** Migrate local image uploads (`static/images`) to Amazon S3 or Cloudinary to ensure persistence across server restarts on serverless environments.
+- [ ] **Server-Side Pagination:** Implement robust cursor-based pagination for the `/shop` route to improve performance when handling thousands of products.
+- [ ] **Stripe Webhooks Integration:** Fully decouple checkout success logic by processing Stripe Webhook events in the background, ensuring database state is perfectly synchronized even if the user closes their browser instantly after paying.
+- [ ] **Advanced AI Context:** Upgrade the Groq AI Chatbot to utilize Vector Search (RAG) directly against the MongoDB product database, allowing the AI to recommend specific URLs to products currently in stock.
 
 ## 📄 License
 This project is open-source and available under the [MIT License](LICENSE).
