@@ -29,5 +29,6 @@ pycparser==2.22
 groq==0.28.0
 
 Flask-SocketIO==5.3.6
-eventlet==0.33.3
+gevent==23.9.1
+gevent-websocket==0.10.1
 stripe==10.1.0
