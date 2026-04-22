@@ -6,48 +6,43 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card border-0" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);">
                 <div class="card-body p-5">
                     <div class="mb-4 text-center">
-                        <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+                        <i class="bi bi-check-circle-fill" style="font-size: 5rem; color: #198754; filter: drop-shadow(0 4px 6px rgba(25, 135, 84, 0.4));"></i>
                     </div>
                     
-                    <h2 class="text-center mb-4">Thank You for Your Order!</h2>
+                    <h2 class="text-center fw-bold mb-4" style="color: #2c3e50;">Thank You For Your Order!</h2>
                     
                     {% if order.payment_method == 'cash' %}
                     <div class="alert alert-info mb-4">
                         <h5 class="alert-heading">Cash on Delivery</h5>
                         <p class="mb-0">Please keep the exact amount of ₹{{ "%.2f"|format(order.total) }} ready at the time of delivery.</p>
                     </div>
-                    {% elif order.payment_method == 'card' %}
+                    {% elif order.payment_status == 'paid_stripe' %}
                     <div class="alert alert-success mb-4">
-                        <h5 class="alert-heading">Card Payment Successful</h5>
-                        <p class="mb-0">Payment has been processed using the card ending with {{ order.payment_details.card_number[-4:] }}</p>
-                    </div>
-                    {% elif order.payment_method == 'upi' %}
-                    <div class="alert alert-success mb-4">
-                        <h5 class="alert-heading">UPI Payment Successful</h5>
-                        <p class="mb-0">Payment has been processed using UPI ID: {{ order.payment_details.upi_id }}</p>
+                        <h5 class="alert-heading">Online Payment Successful</h5>
+                        <p class="mb-0">Your payment has been securely processed by Stripe.</p>
                     </div>
                     {% endif %}
                     
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">Order Details</h5>
-                            <p class="mb-1"><strong>Order ID:</strong> {{ order._id }}</p>
-                            <p class="mb-1"><strong>Date:</strong> {{ order.date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
-                            <p class="mb-0"><strong>Total Amount:</strong> ₹{{ "%.2f"|format(order.total) }}</p>
+                    <div class="card mb-4 border-0" style="background-color: #f8f9fa; border-radius: 12px; border-left: 5px solid #0d6efd !important;">
+                        <div class="card-body p-4">
+                            <h5 class="card-title fw-bold mb-3" style="color: #2c3e50;">Order Details</h5>
+                            <p class="mb-2"><strong style="color: #555;">Order ID:</strong> <span class="user-select-all">{{ order._id }}</span></p>
+                            <p class="mb-2"><strong style="color: #555;">Date:</strong> {{ order.date.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p class="mb-0 fs-5"><strong style="color: #555;">Total Amount:</strong> <span class="fw-bold text-primary">₹{{ "%.2f"|format(order.total) }}</span></p>
                         </div>
                     </div>
                     
-                    <div class="alert alert-info mb-4">
-                        <p class="mb-0">We'll send you an email confirmation with your order details and tracking information once your order ships.</p>
+                    <div class="alert alert-primary mb-4 border-0" style="border-radius: 12px; background-color: rgba(13, 110, 253, 0.1);">
+                        <p class="mb-0 text-dark"><i class="bi bi-envelope-check me-2"></i> We've sent you an email confirmation with your order details and tracking information.</p>
                     </div>
                     
-                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                        <a href="{{ url_for('shop') }}" class="btn btn-primary">Continue Shopping</a>
-                        <a href="{{ url_for('view_order', order_id=order._id) }}" class="btn btn-outline-primary">View Order Details</a>
-                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Return to Home</a>
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mt-5">
+                        <a href="{{ url_for('shop') }}" class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm">Continue Shopping</a>
+                        <a href="{{ url_for('view_order', order_id=order._id) }}" class="btn btn-outline-primary btn-lg rounded-pill px-4">View Order Details</a>
+                        <a href="{{ url_for('index') }}" class="btn btn-light btn-lg rounded-pill px-4">Return Home</a>
                     </div>
                 </div>
             </div>

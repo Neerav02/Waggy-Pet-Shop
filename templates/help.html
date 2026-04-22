@@ -10,7 +10,7 @@
             <div class="card mb-4">
                 <div class="card-body text-center">
                     <div class="profile-image-container mb-3">
-                        <img src="{{ url_for('static', filename='images/profiles/' + (user.profile_image if user.profile_image else 'default.svg')) }}" 
+                        <img src="{{ user.profile_image if user.profile_image and user.profile_image.startswith('http') else url_for('static', filename='images/profiles/' + (user.profile_image if user.profile_image else 'default.svg')) }}" 
                              alt="Profile Image" 
                              class="rounded-circle profile-image"
                              style="width: 150px; height: 150px; object-fit: cover;">
@@ -24,9 +24,6 @@
             </div>
 
             <div class="list-group">
-                <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action">
-                    <i class="bi bi-person"></i> Profile
-                </a>
                 <a href="{{ url_for('profile_details') }}" class="list-group-item list-group-item-action">
                     <i class="bi bi-person-vcard"></i> Profile Details
                 </a>

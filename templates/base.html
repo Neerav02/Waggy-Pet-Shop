@@ -35,6 +35,9 @@
 </head>
 
 <body>
+    <!-- 3D Light Background -->
+    <canvas id="three-bg" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none;"></canvas>
+
     <!-- SVG Sprites -->
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
         <defs>
@@ -108,9 +111,6 @@
                             {{ username if username else 'Account' }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ url_for('profile') }}">
-                                <i class="bi bi-person me-2"></i>Profile
-                            </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('profile_details') }}">
                                 <i class="bi bi-person-vcard me-2"></i>Profile Details
                             </a></li>
@@ -306,6 +306,29 @@
                 alert('Error removing product from cart');
             });
         }
+    </script>
+
+    <!-- AI Chatbot & 3D Environment -->
+    {% include 'components/ai_chatbot.html' ignore missing %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="{{ url_for('static', filename='js/three-bg.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ai-chat.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            document.querySelectorAll('.card, section').forEach(el => {
+                el.classList.add('reveal');
+                revealObserver.observe(el);
+            });
+        });
     </script>
 </body>
 </html>

@@ -355,7 +355,7 @@ button.filter-button:hover {
 
 /* testimonial style  */
 .testimonial-content {
-  color: #908F8D;
+  color: #333333;
 }
 
 iconify-icon.quote-icon {
@@ -366,7 +366,7 @@ iconify-icon.quote-icon {
 
 /* register form  */
 .form-control {
-  color: #908F8D;
+  color: #333333;
   line-height: normal;
   letter-spacing: 0.02125rem;
   text-transform: capitalize;
@@ -387,7 +387,7 @@ iconify-icon.quote-icon {
 
 /* blog style */
 .blog-paragraph {
-  color: #908F8D;
+  color: #333333;
   font-size: 1rem;
   font-weight: 400;
   line-height: normal;
@@ -395,7 +395,7 @@ iconify-icon.quote-icon {
 }
 
 .blog-read {
-  color: #908F8D;
+  color: #333333;
   font-size: 1rem;
   letter-spacing: 0.02rem;
   text-transform: uppercase;
@@ -757,4 +757,45 @@ Single Product section style start
     width: 1.5rem;
     height: 1.5rem;
     border-width: 0.2em;
+}
+
+/* ============================================================
+   Attractive Animations & Hover Effects
+   ============================================================ */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Adding attractive hover to product cards */
+.card, .category-card, .product-item {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+}
+
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: scale(1.02);
 }

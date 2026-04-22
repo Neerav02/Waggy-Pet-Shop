@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 5px; }
+        .logo { color: #0d6efd; font-size: 24px; font-weight: bold; text-decoration: none; }
+        .order-details { margin: 20px 0; padding: 20px; background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 5px; }
+        .item { padding: 10px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        .total { font-weight: bold; font-size: 18px; margin-top: 15px; text-align: right; }
+        .footer { text-align: center; margin-top: 30px; font-size: 0.9em; color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Waggy Pet Shop</div>
+            <h2>Order Confirmation</h2>
+        </div>
+        
+        <p>Dear {{ order.shipping_address.full_name }},</p>
+        <p>Thank you for your order! We've received your order and are getting it ready to be shipped.</p>
+        
+        <div class="order-details">
+            <h3>Order Summary</h3>
+            <p><strong>Order ID:</strong> {{ order._id }}</p>
+            <p><strong>Date:</strong> {{ order.date.strftime('%Y-%m-%d %H:%M') }}</p>
+            
+            <h4 style="margin-top: 20px;">Items:</h4>
+            {% for item in order['items'] %}
+            <div class="item">
+                <span>{{ item.product.name }} (x{{ item.quantity }})</span>
+                <span>₹{{ "%.2f"|format(item.total) }}</span>
+            </div>
+            {% endfor %}
+            
+            <div class="total">
+                Total: ₹{{ "%.2f"|format(order.total) }}
+            </div>
+        </div>
+        
+        <div class="order-details">
+            <h3>Shipping Details</h3>
+            <p>{{ order.shipping_address.address }}</p>
+            <p>{{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.zip_code }}</p>
+        </div>
+        
+        <div class="footer">
+            <p>If you have any questions about your order, please contact our support team.</p>
+            <p>&copy; 2026 Waggy Pet Shop. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

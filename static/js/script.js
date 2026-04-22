@@ -265,6 +265,31 @@ document.addEventListener('DOMContentLoaded', function() {
     initSwiper();
 });
 
+// Global Toast Function
+function showToast(message, type = 'dark') {
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-dark bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    toast.style.zIndex = '9999';
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body fw-bold" style="color: #333 !important;">
+                ${message}
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+    bsToast.show();
+    
+    toast.addEventListener('hidden.bs.toast', function () {
+        toast.remove();
+    });
+}
+
 // Add to Cart functionality
 function addToCart(productId) {
     const quantity = document.getElementById('quantity') ? parseInt(document.getElementById('quantity').value) : 1;
@@ -279,63 +304,22 @@ function addToCart(productId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Show success message
-            const toast = document.createElement('div');
-            toast.className = 'toast align-items-center text-white bg-dark border-0 position-fixed bottom-0 end-0 m-3';
-            toast.setAttribute('role', 'alert');
-            toast.setAttribute('aria-live', 'assertive');
-            toast.setAttribute('aria-atomic', 'true');
-            toast.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">
-                        Product added to cart successfully!
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            `;
-            document.body.appendChild(toast);
-            const bsToast = new bootstrap.Toast(toast);
-            bsToast.show();
-            
-            // Update cart count
+            showToast('Product added to cart successfully!', 'success');
             updateCartCount();
-            
-            // Remove toast after it's hidden
-            toast.addEventListener('hidden.bs.toast', function () {
-                toast.remove();
-            });
         } else {
             if (data.error === 'Please login to add items to cart') {
-                // Show login required message
-                const toast = document.createElement('div');
-                toast.className = 'toast align-items-center text-white bg-dark border-0 position-fixed bottom-0 end-0 m-3';
-                toast.setAttribute('role', 'alert');
-                toast.setAttribute('aria-live', 'assertive');
-                toast.setAttribute('aria-atomic', 'true');
-                toast.innerHTML = `
-                    <div class="d-flex">
-                        <div class="toast-body">
-                            Please login to add items to cart
-                        </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                `;
-                document.body.appendChild(toast);
-                const bsToast = new bootstrap.Toast(toast);
-                bsToast.show();
-                
-                // Redirect to login page after a short delay
+                showToast('Please login to add items to cart', 'warning');
                 setTimeout(() => {
                     window.location.href = '/login';
                 }, 1500);
             } else {
-                alert(data.error || 'Error adding product to cart');
+                showToast(data.error || 'Error adding product to cart', 'danger');
             }
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error adding product to cart');
+        showToast('Error adding product to cart', 'danger');
     });
 }
 

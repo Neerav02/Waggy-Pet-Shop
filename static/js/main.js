@@ -13,14 +13,14 @@ function addToCart(productId) {
     .then(response => response.json())
     .then(data => {
         if (data.message) {
-            alert('Product added to cart!');
+            typeof showToast === 'function' ? showToast('Product added to cart!', 'success') : alert('Product added to cart!');
         } else if (data.error) {
-            alert(data.error);
+            typeof showToast === 'function' ? showToast(data.error, 'danger') : alert(data.error);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error adding product to cart');
+        typeof showToast === 'function' ? showToast('Error adding product to cart', 'danger') : alert('Error adding product to cart');
     });
 }
 
@@ -43,6 +43,6 @@ function removeFromCart(productId) {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error removing product from cart');
+        typeof showToast === 'function' ? showToast('Error removing product from cart', 'danger') : alert('Error removing product from cart');
     });
-} 
+}

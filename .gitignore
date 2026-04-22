@@ -1,3 +1,37 @@
+# Environment
 .env
+.env.local
+.env.production
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads
+static/images/profiles/
+static/images/products/uploads/
+
+# Logs
+*.log
+
+# Vercel
+.vercel/
+
+# Node
+node_modules/
